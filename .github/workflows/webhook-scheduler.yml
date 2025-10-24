@@ -9,6 +9,8 @@ on:
 jobs:
   call-webhook:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -37,7 +39,5 @@ jobs:
           git diff --quiet && git diff --staged --quiet || git commit -m "Update call log [skip ci]"
 
       - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
+        run: |
+          git push
