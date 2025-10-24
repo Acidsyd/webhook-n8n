@@ -1,0 +1,43 @@
+name: Smart Webhook Scheduler
+
+on:
+  schedule:
+    # Runs every 15 minutes (96 times per day)
+    - cron: '*/15 * * * *'
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  call-webhook:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install requests pytz
+
+      - name: Run smart scheduler
+        env:
+          N8N_WEBHOOK_URL: ${{ secrets.N8N_WEBHOOK_URL }}
+        run: |
+          python scheduler.py
+
+      - name: Commit updated call log
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add call_log.json
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update call log [skip ci]"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
