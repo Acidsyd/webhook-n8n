@@ -16,7 +16,7 @@ from zoneinfo import ZoneInfo
 WEBHOOK_URL = os.environ.get('N8N_WEBHOOK_URL')
 TIMEZONE = ZoneInfo('Europe/Rome')
 CALL_LOG_FILE = 'call_log.json'
-MAX_CALLS_PER_MONTH = 600
+MAX_CALLS_PER_MONTH = 1800
 
 # Business hours: 9 AM to 5 PM Rome time
 BUSINESS_START = 9

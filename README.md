@@ -1,6 +1,6 @@
 # Smart Webhook Scheduler with Ultra-Realistic Human Behavior
 
-A GitHub Actions-powered webhook scheduler that mimics natural human activity patterns to call your n8n webhook approximately **600 times per month** with ultra-realistic behavior.
+A GitHub Actions-powered webhook scheduler that mimics natural human activity patterns to call your n8n webhook approximately **1,800 times per month** with ultra-realistic behavior.
 
 ## Why This Is Different
 
@@ -12,7 +12,7 @@ Most automated schedulers have detectable patterns. This one doesn't. It simulat
 - **Weekly Patterns**: Slower on Mondays (70%) and Fridays (80%)
 - **Random Skips**: Days (10%), hours (20%), and individual executions (15%)
 - **Human Jitter**: Random 0-10 minute delays before each call
-- **Monthly Cap**: Automatically stops at 600 calls per month
+- **Monthly Cap**: Automatically stops at 1,800 calls per month
 
 ## Quick Start
 
@@ -26,7 +26,7 @@ Most automated schedulers have detectable patterns. This one doesn't. It simulat
 
 ### Realistic Time Patterns
 
-- Runs every 15 minutes (GitHub Actions cron)
+- Runs every 5 minutes (GitHub Actions cron)
 - Filters for business hours: 9 AM - 5 PM Rome time
 - Weekdays only (no weekends)
 - Reduced activity during lunch: 12-2 PM
@@ -55,7 +55,7 @@ Automatically skips:
 ### Monthly Limit
 
 - Tracks calls per month in `call_log.json`
-- Stops automatically at 600 calls
+- Stops automatically at 1,800 calls
 - Resets counter on new month
 
 ## Files
@@ -77,14 +77,14 @@ Automatically skips:
 
 **$0.00/month** - Runs entirely on GitHub Actions free tier.
 
-GitHub provides 2,000 free minutes/month. This workflow uses ~100 minutes/month.
+GitHub provides 2,000 free minutes/month. This workflow uses ~300 minutes/month.
 
 ## Setup
 
 1. Fork this repository or create a new one with these files
 2. Add your webhook URL as a secret (`N8N_WEBHOOK_URL`)
 3. Push to GitHub
-4. Done! It runs automatically every 15 minutes
+4. Done! It runs automatically every 5 minutes
 
 **For detailed setup steps, see [QUICK_SETUP.md](QUICK_SETUP.md).**
 
