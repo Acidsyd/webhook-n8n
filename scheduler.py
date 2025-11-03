@@ -22,10 +22,10 @@ MAX_CALLS_PER_MONTH = 1800
 BUSINESS_START = 9
 BUSINESS_END = 17
 
-# Lunch break: 12 PM to 2 PM (70% less activity)
+# Lunch break: 12 PM to 2 PM (30% less activity)
 LUNCH_START = 12
 LUNCH_END = 14
-LUNCH_ACTIVITY_REDUCTION = 0.7
+LUNCH_ACTIVITY_REDUCTION = 0.3
 
 
 def load_call_log():
@@ -88,12 +88,12 @@ def get_day_activity_multiplier():
     now = datetime.now(TIMEZONE)
     day = now.weekday()  # Monday = 0, Sunday = 6
 
-    # Monday: 0.7x (slower start)
+    # Monday: 0.85x (slower start)
     if day == 0:
-        return 0.7
-    # Friday: 0.8x (winding down)
+        return 0.85
+    # Friday: 0.9x (winding down)
     elif day == 4:
-        return 0.8
+        return 0.9
     # Tuesday-Thursday: 1.0x (full activity)
     else:
         return 1.0
@@ -105,22 +105,22 @@ def get_lunch_multiplier():
     hour = now.hour
 
     if LUNCH_START <= hour < LUNCH_END:
-        return 1.0 - LUNCH_ACTIVITY_REDUCTION  # 30% activity during lunch
+        return 1.0 - LUNCH_ACTIVITY_REDUCTION  # 70% activity during lunch
     return 1.0
 
 
 def should_skip_day():
-    """Random chance to skip entire day (10%)."""
+    """Random chance to skip entire day (3%)."""
     now = datetime.now(TIMEZONE)
     random.seed(now.strftime('%Y-%m-%d'))  # Consistent per day
-    return random.random() < 0.10
+    return random.random() < 0.03
 
 
 def should_skip_hour():
-    """Random chance to skip current hour (20%)."""
+    """Random chance to skip current hour (10%)."""
     now = datetime.now(TIMEZONE)
     random.seed(now.strftime('%Y-%m-%d-%H'))  # Consistent per hour
-    return random.random() < 0.20
+    return random.random() < 0.10
 
 
 def should_execute():
@@ -163,7 +163,7 @@ def should_execute():
     # Calculate execution probability based on multipliers
     day_mult = get_day_activity_multiplier()
     lunch_mult = get_lunch_multiplier()
-    base_probability = 0.85  # 85% base chance
+    base_probability = 0.95  # 95% base chance
 
     final_probability = base_probability * day_mult * lunch_mult
 
