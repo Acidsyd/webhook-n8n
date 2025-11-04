@@ -1,10 +1,7 @@
 name: Smart Webhook Scheduler
 
 on:
-  schedule:
-    # Runs every 5 minutes (288 times per day)
-    - cron: '*/5 * * * *'
-  workflow_dispatch:  # Allows manual triggering
+  workflow_dispatch:  # Triggered by cron-job.org via API
 
 jobs:
   call-webhook:
