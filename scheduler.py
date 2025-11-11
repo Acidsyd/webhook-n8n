@@ -84,43 +84,73 @@ def is_business_hours():
 
 
 def get_day_activity_multiplier():
-    """Get activity multiplier based on day of week."""
+    """Get activity multiplier based on day of week with randomness."""
     now = datetime.now(TIMEZONE)
     day = now.weekday()  # Monday = 0, Sunday = 6
 
-    # Monday: 0.85x (slower start)
-    if day == 0:
-        return 0.85
-    # Friday: 0.9x (winding down)
-    elif day == 4:
-        return 0.9
-    # Tuesday-Thursday: 1.0x (full activity)
-    else:
-        return 1.0
+    # Add randomness to each day instead of fixed multipliers
+    if day == 0:  # Monday: slower start
+        base = 0.85
+        multiplier = base + random.uniform(-0.05, 0.10)  # 0.80-0.95
+    elif day == 4:  # Friday: variable (sometimes distracted, sometimes productive)
+        base = 0.90
+        multiplier = base + random.uniform(-0.10, 0.10)  # 0.80-1.00
+    else:  # Tuesday-Thursday: mostly active but with variation
+        base = 1.0
+        multiplier = base + random.uniform(-0.05, 0.05)  # 0.95-1.05
+
+    return max(0.7, min(multiplier, 1.05))  # Keep within reasonable bounds
 
 
 def get_lunch_multiplier():
-    """Get activity multiplier during lunch hours."""
+    """Get activity multiplier during lunch hours with randomness."""
     now = datetime.now(TIMEZONE)
     hour = now.hour
 
     if LUNCH_START <= hour < LUNCH_END:
-        return 1.0 - LUNCH_ACTIVITY_REDUCTION  # 70% activity during lunch
+        # Variable lunch behavior - sometimes people work through lunch, sometimes not
+        base_reduction = LUNCH_ACTIVITY_REDUCTION + random.uniform(-0.15, 0.10)
+        base_reduction = max(0.10, min(base_reduction, 0.50))  # 50-90% activity
+        return 1.0 - base_reduction
     return 1.0
 
 
 def should_skip_day():
-    """Random chance to skip entire day (3%)."""
-    now = datetime.now(TIMEZONE)
-    random.seed(now.strftime('%Y-%m-%d'))  # Consistent per day
-    return random.random() < 0.03
+    """Random chance to skip entire day - varies by day."""
+    # Don't use seeded random - make it truly unpredictable
+    # Base chance is 3%, but add some randomness
+    skip_chance = random.uniform(0.02, 0.05)  # 2-5% chance
+    return random.random() < skip_chance
 
 
 def should_skip_hour():
-    """Random chance to skip current hour (10%)."""
+    """Random chance to skip current hour - varies throughout the day."""
     now = datetime.now(TIMEZONE)
-    random.seed(now.strftime('%Y-%m-%d-%H'))  # Consistent per hour
-    return random.random() < 0.10
+
+    # Base skip probability varies by time of day
+    hour = now.hour
+
+    # Early morning (9-10 AM): lower skip chance (getting started)
+    if 9 <= hour < 10:
+        base_skip = 0.05
+    # Mid-morning (10-12): very active
+    elif 10 <= hour < 12:
+        base_skip = 0.08
+    # Lunch time (12-14): higher skip chance
+    elif 12 <= hour < 14:
+        base_skip = 0.25
+    # Afternoon (14-16): active again
+    elif 14 <= hour < 16:
+        base_skip = 0.10
+    # Late afternoon (16-17): winding down
+    else:
+        base_skip = 0.15
+
+    # Add randomness to the base probability
+    skip_chance = base_skip + random.uniform(-0.03, 0.05)
+    skip_chance = max(0, min(skip_chance, 0.4))  # Keep between 0-40%
+
+    return random.random() < skip_chance
 
 
 def should_execute():
@@ -163,9 +193,16 @@ def should_execute():
     # Calculate execution probability based on multipliers
     day_mult = get_day_activity_multiplier()
     lunch_mult = get_lunch_multiplier()
-    base_probability = 0.95  # 95% base chance
+
+    # Variable base probability instead of fixed 95%
+    base_probability = random.uniform(0.85, 0.98)  # 85-98% base chance
 
     final_probability = base_probability * day_mult * lunch_mult
+
+    # Add occasional "micro-break" - random very low probability periods
+    if random.random() < 0.05:  # 5% chance of micro-break
+        final_probability *= 0.3  # Reduce probability to 30%
+        print(f"☕ Micro-break period detected (probability: {final_probability:.2%})")
 
     # Random execution skip (based on final probability)
     if random.random() > final_probability:
@@ -176,8 +213,19 @@ def should_execute():
 
 
 def add_human_jitter():
-    """Add random delay to simulate human interaction timing (0-600 seconds / 0-10 minutes)."""
-    jitter = random.uniform(0, 600)
+    """Add random delay to simulate human interaction timing with exponential distribution."""
+    # Use exponential distribution for more realistic behavior
+    # Most delays are short, but occasionally long delays occur
+    # 80% of delays will be under 5 minutes, but can go up to 15 minutes
+
+    if random.random() < 0.15:  # 15% chance of "burst" activity (quick response)
+        jitter = random.uniform(0, 60)  # 0-1 minute
+    elif random.random() < 0.70:  # 70% normal activity
+        jitter = random.expovariate(1/180) # Average 3 minutes, but exponentially distributed
+        jitter = min(jitter, 600)  # Cap at 10 minutes
+    else:  # 15% chance of distracted/slow response
+        jitter = random.uniform(300, 900)  # 5-15 minutes
+
     minutes = jitter / 60
     print(f"⏱️ Adding human jitter: {jitter:.0f} seconds ({minutes:.1f} minutes)")
     time.sleep(jitter)

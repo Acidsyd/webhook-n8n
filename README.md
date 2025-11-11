@@ -4,14 +4,16 @@ A GitHub Actions-powered webhook scheduler that mimics natural human activity pa
 
 ## Why This Is Different
 
-Most automated schedulers have detectable patterns. This one doesn't. It simulates realistic human behavior with:
+Most automated schedulers have detectable patterns. This one doesn't. It simulates realistic human behavior with **enhanced unpredictability**:
 
 - **Business Hours Only**: 9 AM - 5 PM Rome time, Monday-Friday
 - **Vacation Breaks**: Automatically skips August, Christmas, and random weeks
-- **Lunch Slowdown**: 70% less activity during lunch hours (12-2 PM)
-- **Weekly Patterns**: Slower on Mondays (70%) and Fridays (80%)
-- **Random Skips**: Days (10%), hours (20%), and individual executions (15%)
-- **Human Jitter**: Random 0-10 minute delays before each call
+- **Variable Lunch Behavior**: 50-90% activity during lunch (12-2 PM) - varies randomly
+- **Dynamic Weekly Patterns**: Monday/Friday activity varies (not fixed percentages)
+- **Smart Random Skips**: Variable skip rates that change throughout the day
+- **Exponential Jitter**: 15% quick bursts (0-1 min), 70% normal (avg 3 min), 15% slow (5-15 min)
+- **Micro-Breaks**: Random 5% chance of very low activity periods
+- **Time-Aware Skips**: Skip probability varies by hour (higher during lunch, lower mid-morning)
 - **Monthly Cap**: Automatically stops at 1,800 calls per month
 
 ## Quick Start
@@ -40,17 +42,21 @@ Automatically skips:
 
 ### Activity Variation
 
-- **Monday**: 70% activity (slow start to week)
-- **Tuesday-Thursday**: 100% activity (peak productivity)
-- **Friday**: 80% activity (winding down)
-- **Lunch hours**: 30% activity (12-2 PM)
+- **Monday**: 80-95% activity (slow start, but varies)
+- **Tuesday-Thursday**: 95-105% activity (peak productivity with natural variation)
+- **Friday**: 80-100% activity (sometimes distracted, sometimes productive)
+- **Lunch hours**: 50-90% activity (varies daily - some work through lunch)
 
-### Random Behavior
+### Random Behavior (Enhanced Unpredictability)
 
-- **10% chance** to skip entire day
-- **20% chance** to skip current hour
-- **~15% chance** to skip individual execution
-- **0-10 minutes** random delay before each call
+- **2-5% variable chance** to skip entire day (not fixed)
+- **Time-aware hour skips**: 5-25% depending on time (higher during lunch)
+- **Variable execution probability**: 85-98% base chance (not fixed 95%)
+- **5% micro-break chance**: Sudden low-activity periods
+- **Exponential jitter delays**:
+  - 15% burst activity: 0-1 minute
+  - 70% normal: avg 3 minutes (exponential distribution)
+  - 15% distracted: 5-15 minutes
 
 ### Monthly Limit
 
